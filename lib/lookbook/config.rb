@@ -1,6 +1,6 @@
 module Lookbook
   class Config
-    DEFAULTS = {
+    OPTIONS = {
       project_name: "Lookbook",
       log_level: 2,
       log_use_rails_logger: true,
@@ -14,6 +14,7 @@ module Lookbook
       page_options: {},
       markdown_options: Markdown::DEFAULT_OPTIONS,
 
+      sort_examples: false,
       preview_paths: [],
       preview_display_params: {},
       preview_srcdoc: nil,
@@ -34,7 +35,6 @@ module Lookbook
         datetime_local: "lookbook/previews/inputs/text"
       },
       preview_params_options_eval: false,
-      sort_examples: false,
 
       listen: Rails.env.development?,
       listen_paths: [],
@@ -57,62 +57,59 @@ module Lookbook
 
       debug_menu: Rails.env.development?,
 
-      experimental_features: false,
+      experimental_features: false
+    }
 
-      inspector_panels: {
-        preview: {
-          pane: :main,
-          position: 1,
-          partial: "lookbook/previews/panels/preview",
-          hotkey: "v",
-          panel_classes: "overflow-hidden",
-          padded: false,
-          system: true
-        },
-        output: {
-          pane: :main,
-          position: 2,
-          partial: "lookbook/previews/panels/output",
-          label: "HTML",
-          hotkey: "h",
-          padded: false,
-          system: true
-        },
-        source: {
-          pane: :drawer,
-          position: 1,
-          partial: "lookbook/previews/panels/source",
-          label: "Source",
-          hotkey: "s",
-          copy: ->(data) { data.examples.map { |e| e.source }.join("\n") },
-          padded: false,
-          system: true
-        },
-        notes: {
-          pane: :drawer,
-          position: 2,
-          partial: "lookbook/previews/panels/notes",
-          label: "Notes",
-          hotkey: "n",
-          disabled: ->(data) { data.examples.select { |e| e.notes.present? }.none? },
-          padded: false,
-          system: true
-        },
-        params: {
-          pane: :drawer,
-          position: 3,
-          partial: "lookbook/previews/panels/params",
-          label: "Params",
-          hotkey: "p",
-          disabled: ->(data) { data.preview.params.none? },
-          padded: false,
-          system: true
-        }
+    SYSTEM = {
+      preview_default_panel_group: :drawer,
+      preview_panels: {
+        main: [
+          {
+            name: "preview",
+            partial: "lookbook/previews/panels/preview",
+            hotkey: "v",
+            panel_classes: "overflow-hidden"
+          },
+          {
+            name: "output",
+            partial: "lookbook/previews/panels/output",
+            label: "HTML",
+            hotkey: "h"
+          }
+        ],
+        drawer: [
+          {
+            name: "source",
+            partial: "lookbook/previews/panels/source",
+            label: "Source",
+            hotkey: "s",
+            copy: ->(data) { data.examples.map { |e| e.source }.join("\n") }
+          },
+          {
+            name: "notes",
+            partial: "lookbook/previews/panels/notes",
+            label: "Notes",
+            hotkey: "n",
+            disabled: ->(data) { data.examples.select { |e| e.notes.present? }.none? }
+          },
+          {
+            name: "params",
+            partial: "lookbook/previews/panels/params",
+            label: "Params",
+            hotkey: "p",
+            disabled: ->(data) { data.preview.params.none? }
+          }
+        ]
       }
     }
 
     def initialize
-      @options = Store.new(Config::DEFAULTS, recursive: true)
+      @options = Store.new(Config::OPTIONS, recursive: true)
+      @system = Store.new(Config::SYSTEM, recursive: true)
+    end
+
+    def _system
+      @system
     end
 
     def runtime_parsing=(value)
@@ -158,57 +155,6 @@ module Lookbook
 
     def parser_registry_path
       absolute_path(@options.parser_registry_path)
-    end
-
-    def inspector_panels(&block)
-      panels = Store.new(@options.inspector_panels.select { |key, panel| panel != false })
-      if block
-        yield panels
-      else
-        panels
-      end
-    end
-
-    def define_inspector_panel(name, opts = {})
-      pane = opts[:pane].presence || :drawer
-      siblings = inspector_panels.select { |key, panel| panel.pane == pane }
-      opts[:position] ||= siblings.size + 1
-      @options.inspector_panels[name] = opts
-      siblings.each do |key, panel|
-        if panel.position >= opts[:position]
-          panel.position += 1
-        end
-      end
-    end
-
-    def amend_inspector_panel(name, opts = {})
-      if opts == false
-        @options.inspector_panels[name] = false
-      else
-        @options.inspector_panels[name].merge!(opts)
-      end
-    end
-
-    def remove_inspector_panel(name)
-      amend_inspector_panel(name, false)
-    end
-
-    def inspector_panel_defaults
-      {
-        id: ->(data) { "inspector-panel-#{data.name}" },
-        partial: "lookbook/previews/panels/content",
-        content: nil,
-        label: ->(data) { data.name.titleize },
-        pane: :drawer,
-        position: ->(data) { data.index_position },
-        hotkey: nil,
-        disabled: false,
-        show: true,
-        copy: nil,
-        panel_classes: nil,
-        locals: {},
-        system: false
-      }
     end
 
     def ui_theme=(name)
