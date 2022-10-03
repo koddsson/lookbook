@@ -10,7 +10,6 @@ loader.setup
 module Lookbook
   class << self
     include Lookbook::Hooks
-    include Lookbook::Panels
     include Lookbook::Tags
 
     def version
@@ -72,6 +71,19 @@ module Lookbook
         partial: partial,
         input_options: input_options || {}
       }
+    end
+
+    def define_panel(name, *args)
+      group = config._system.preview_default_panel_group
+      Panels::PanelManager.add(name, group, *args)
+    end
+
+    def amend_panel(*args)
+      Panels::PanelManager.update(*args)
+    end
+
+    def remove_panel(name)
+      Panels::PanelManager.remove(name)
     end
   end
 end

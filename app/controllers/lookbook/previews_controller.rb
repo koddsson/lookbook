@@ -156,38 +156,12 @@ module Lookbook
       })
     end
 
-    def panels
-      return @panels if @panels.present?
-      inspector_data_hash = inspector_data.to_h
-      panel_counts = {}
-
-      @panels = Lookbook.config.inspector_panels.map do |name, config|
-        config_with_defaults = Lookbook.config.inspector_panel_defaults.merge(config)
-        panel_counts[config_with_defaults[:pane].to_sym] ||= 0
-        panel_counts[config_with_defaults[:pane].to_sym] += 1
-
-        callable_data = {
-          name: name.to_s,
-          index_position: panel_counts[config_with_defaults[:pane].to_sym],
-          **inspector_data_hash
-        }
-
-        resolved_config = config_with_defaults.transform_values do |value|
-          value.instance_of?(Proc) ? value.call(Lookbook::Store.new(callable_data)) : value
-        end
-        resolved_config[:name] = name.to_s
-        Store.new(resolved_config)
-      end
-
-      @panels = @panels.select(&:show).sort_by { |p| [p.position, p.label] }
-    end
-
     def main_panels
-      panels.select { |panel| panel.pane == :main }
+      Panels::PanelManager.init_all(:main, inspector_data)
     end
 
     def drawer_panels
-      panels.select { |panel| panel.pane == :drawer }
+      Panels::PanelManager.init_all(:drawer, inspector_data)
     end
 
     def preview_controller

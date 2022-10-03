@@ -9,6 +9,11 @@ module Lookbook
     config.autoload_paths << File.expand_path(Lookbook::Engine.root.join("app/components"))
     config.lookbook = Lookbook.config
 
+    config.before_configuration do
+      panels_config = Lookbook.config._system.preview_panels
+      Panels::PanelManager.load_from_config(panels_config)
+    end
+
     initializer "lookbook.viewcomponent.config" do
       config.lookbook.preview_paths += config.view_component.preview_paths
       config.lookbook.preview_controller ||= config.view_component.preview_controller

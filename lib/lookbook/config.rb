@@ -67,8 +67,7 @@ module Lookbook
           {
             name: "preview",
             partial: "lookbook/previews/panels/preview",
-            hotkey: "v",
-            panel_classes: "overflow-hidden"
+            hotkey: "v"
           },
           {
             name: "output",
