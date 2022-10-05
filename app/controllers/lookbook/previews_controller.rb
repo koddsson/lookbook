@@ -157,11 +157,15 @@ module Lookbook
     end
 
     def main_panels
-      Panels::PanelManager.init_all(:main, inspector_data)
+      Lookbook.config._panels.in_group(:main).map do |config|
+        PanelsConfigStore.resolve_config(config, inspector_data)
+      end
     end
 
     def drawer_panels
-      Panels::PanelManager.init_all(:drawer, inspector_data)
+      Lookbook.config._panels.in_group(:drawer).map do |config|
+        PanelsConfigStore.resolve_config(config, inspector_data)
+      end
     end
 
     def preview_controller

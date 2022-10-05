@@ -5,6 +5,7 @@ require "lookbook/version"
 loader = Zeitwerk::Loader.for_gem
 loader.ignore("#{__dir__}/lookbook.rb")
 loader.push_dir("#{__dir__}/lookbook", namespace: Lookbook)
+loader.collapse("#{__dir__}/lookbook/*")
 loader.setup
 
 module Lookbook
@@ -74,18 +75,18 @@ module Lookbook
     end
 
     def define_panel(name, *args)
-      group = config._system.preview_default_panel_group
-      Panels::PanelManager.add(name, group, *args)
+      config._panels.add(name, :drawer, *args)
     end
 
     def amend_panel(*args)
-      Panels::PanelManager.update(*args)
+      config._panels.update(*args)
     end
 
     def remove_panel(name)
-      Panels::PanelManager.remove(name)
+      config._panels.remove(name)
     end
   end
 end
 
+require "rails"
 require "lookbook/engine"

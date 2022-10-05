@@ -60,55 +60,51 @@ module Lookbook
       experimental_features: false
     }
 
-    SYSTEM = {
-      preview_default_panel_group: :drawer,
-      preview_panels: {
-        main: [
-          {
-            name: "preview",
-            partial: "lookbook/previews/panels/preview",
-            hotkey: "v"
-          },
-          {
-            name: "output",
-            partial: "lookbook/previews/panels/output",
-            label: "HTML",
-            hotkey: "h"
-          }
-        ],
-        drawer: [
-          {
-            name: "source",
-            partial: "lookbook/previews/panels/source",
-            label: "Source",
-            hotkey: "s",
-            copy: ->(data) { data.examples.map { |e| e.source }.join("\n") }
-          },
-          {
-            name: "notes",
-            partial: "lookbook/previews/panels/notes",
-            label: "Notes",
-            hotkey: "n",
-            disabled: ->(data) { data.examples.select { |e| e.notes.present? }.none? }
-          },
-          {
-            name: "params",
-            partial: "lookbook/previews/panels/params",
-            label: "Params",
-            hotkey: "p",
-            disabled: ->(data) { data.preview.params.none? }
-          }
-        ]
-      }
+    PANELS = {
+      main: [
+        {
+          name: "preview",
+          partial: "lookbook/previews/panels/preview",
+          hotkey: "v"
+        },
+        {
+          name: "output",
+          partial: "lookbook/previews/panels/output",
+          label: "HTML",
+          hotkey: "h"
+        }
+      ],
+      drawer: [
+        {
+          name: "source",
+          partial: "lookbook/previews/panels/source",
+          label: "Source",
+          hotkey: "s",
+          copy: ->(data) { data.examples.map { |e| e.source }.join("\n") }
+        },
+        {
+          name: "notes",
+          partial: "lookbook/previews/panels/notes",
+          label: "Notes",
+          hotkey: "n",
+          disabled: ->(data) { data.examples.select { |e| e.notes.present? }.none? }
+        },
+        {
+          name: "params",
+          partial: "lookbook/previews/panels/params",
+          label: "Params",
+          hotkey: "p",
+          disabled: ->(data) { data.preview.params.none? }
+        }
+      ]
     }
 
     def initialize
       @options = Store.new(Config::OPTIONS, recursive: true)
-      @system = Store.new(Config::SYSTEM, recursive: true)
     end
 
-    def _system
-      @system
+    def _panels
+      @panels ||= PanelsConfigStore.new(Config::PANELS)
     end
 
     def runtime_parsing=(value)

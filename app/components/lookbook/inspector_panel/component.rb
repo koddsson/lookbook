@@ -2,12 +2,15 @@ require "css_parser"
 
 module Lookbook
   class InspectorPanel::Component < Lookbook::BaseComponent
-    attr_reader :panel_styles, :panel_html, :id
+    attr_reader :panel_styles, :panel_html
 
-    def initialize(id:, name:, **attrs)
-      @id = id
+    def initialize(name:, **attrs)
       @name = name
       super(**attrs)
+    end
+
+    def id
+      AttributeUtils.dom_id("panel", @name)
     end
 
     def before_render

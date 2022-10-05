@@ -50,7 +50,7 @@
       <%= lookbook_render :tab_panels, alpine_data: "$store.inspector.main", id: "inspector-panels-main" do |tabs| %>
         <% @main_panels.each do |panel| %>
           <% tabs.panel name: panel.name do %>
-            <%= lookbook_render :inspector_panel, id: panel.dom_id, name: panel.name do %>
+            <%= lookbook_render :inspector_panel, name: panel.name do %>
               <%= render panel.partial, **@inspector_data, panel: panel, **panel.locals %>
             <% end %>
           <% end %>
@@ -120,7 +120,7 @@
       <%= lookbook_render :tab_panels, alpine_data: "$store.inspector.drawer", id: "inspector-panels-drawer" do |tabs| %>
         <% @drawer_panels.each do |panel| %>
           <% tabs.panel name: panel.name do %>
-            <%= lookbook_render :inspector_panel, id: panel.dom_id, name: panel.name do %>
+            <%= lookbook_render :inspector_panel, name: panel.name do %>
               <%= render panel.partial, **@inspector_data, panel: panel, **panel.locals %>
             <% end %>
           <% end %>
