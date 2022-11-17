@@ -8,12 +8,10 @@ export default function paramsInputComponent({ name, value }) {
     },
 
     update() {
-      if (this.validate()) {
-        const searchParams = new URLSearchParams(window.location.search);
-        searchParams.set(this.name, this.value);
-        const path = location.href.replace(location.search, "");
-        this.navigateTo(`${path}?${searchParams.toString()}`);
-      }
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.set(this.name, this.value);
+      const path = location.href.replace(location.search, "");
+      this.navigateTo(`${path}?${searchParams.toString()}`);
     },
 
     validate() {
